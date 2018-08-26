@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     # http://whitenoise.evans.io/en/stable/django.html#using-whitenoise-in-development
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
-    'oracleapp.apps.BusyappConfig',
+    'oracleapp.apps.OracleappConfig',
 ]
 
 #SECURE_SSL_REDIRECT = True
