@@ -12,7 +12,7 @@ import json
 import urllib
 from pathlib import Path
 
-from .forms import OnTheGoForm, PlannerForm, TouristForm
+from .forms import OnTheGoForm, PlannerForm, TouristForm, OracleForm
 from .ml import predictor_ann_improved
 from .ml import getWeather
 from .ml import getDayOfYear
@@ -125,8 +125,14 @@ def busStopAutosuggest(request):
 knownWords = Path(STATIC_ROOT+'/knownWords')
 words = knownWords / 'words.json' #Using the special ' / ' path notation from Pathlib
 def queryAutosuggest(request):
-    with open(words, 'r') as file:
-        return HttpResponse(file.read())
+    params = request.GET;
+    firstLetter = params['word'][0]
+    with open(words, 'r') as wordsFile:
+        #wordsDict = json.load(wordsFile)
+        #if firstLetter in wordsDict:
+        #    pass
+
+        return HttpResponse(wordsFile.read())
 
 
 #Function for RTPI querying for Route Number Autosuggests.
@@ -184,6 +190,41 @@ def getLiveBusInfo(stop_id, route_id):
             return None
     else:
         return None
+
+
+def oracleForm(request):
+    if request.method == 'GET':
+        params = request.GET
+        form = OracleForm(params)
+
+        #Prefered way of handling forms, validate first before using.
+        if form.is_valid():
+            userQuery = form.cleaned_data['query_var']
+
+            # DO SOME CLEAN UP....
+
+            # FEED INTO MACHINE LEARNING MODEL TO DISCERN THE SENTIMENT OF THE SENTENCE
+            # sentimentAnalyzer = getSentimentModel(userQuery)
+            sentimentAnalyzer = None
+
+            if sentimentAnalyzer is None:  # Model could not be retrieved
+                pass
+            else: # call the machine learning function & parse query
+                #sentimentScore = sentimentAnalyzer(query=query)
+                sentimentScore = 0 #0 == neutral, i.e. no sentiment
+
+
+            # Construct the response
+            answer = "That's a tricky one, let me think for a bit..."
+            answer = answer+answer+answer+answer+answer+answer+answer
+
+            # server side rendering of the response html
+            return render(request, 'oracle_response.html', {'answer' : answer,
+                                                            'error': 0}) #0 means everything good
+        else:
+            answer = "Oops, something went wrong with the server :/"
+            return render(request, 'oracle_response.html', {'answer': answer,
+                                                            'error': 1})  # Error code > 0 means something bad happened...
 
 
 def onthegoform(request):

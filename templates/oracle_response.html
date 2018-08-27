@@ -1,0 +1,42 @@
+<br/>
+
+{% if error == 0 %}
+<div class="row">
+    <br>
+    <div class="col-sm-3">
+        <!-- -->
+    </div>
+
+    <!-- user input -->
+    <div class="col-sm-5">
+        <hover title="Answer">
+            <p>{{ answer }}</p>
+        </hover>
+    </div>
+
+    <div id="feedback">
+        <div class="col-sm-2 col-xs-6">
+            <p>Am I making sense?</p>
+        </div>
+
+        <div class="col-sm-1 col-xs-3">
+            <button class="btn btn-primary" id="yesBtn">Yes</button>
+        </div>
+
+        <div class="col-sm-1 col-xs-3">
+            <button class="btn btn-primary" id="noBtn">No</button>
+        </div>
+    </div>
+
+</div>
+{% endif %}
+
+
+{% if error != 0 %}
+<!-- there's an error, display error messages -->
+<div class="row text-center">
+    <div class="col-sm-12">
+        <h3 style="color: red;">{{ answer }}</h3>
+    </div>
+</div>
+{% endif %}

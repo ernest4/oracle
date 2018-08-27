@@ -1,6 +1,8 @@
 from django import forms
 from django.forms.widgets import SelectDateWidget
 
+class OracleForm(forms.Form):
+    query_var = forms.CharField()
 
 class OnTheGoForm(forms.Form):
     busnum_var = forms.CharField()

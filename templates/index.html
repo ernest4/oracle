@@ -32,12 +32,15 @@
 <!-- main body -->
 
 <div class="container">
+
+    <!-- title row -->
     <div class="row">
         <div class="col-sm-12">
             <h1>Oracle</h1>
         </div>
     </div>
 
+    <!-- top row: text, Oracle icon, text -->
     <div class="row">
         <div class="col-sm-4">
             <p><b>Come let's chat! Tell me about your day,
@@ -65,21 +68,20 @@
         </div>
     </div>
 
+    <!-- chat row: space, input text field, submit button, space -->
     <div class="row">
         <br>
-    
-            
-        <form action="/onthego/formdata" method="get" id="oracle_form">
+        <form action="/oracle/formdata" method="get" id="oracle_form">
             <div class="col-sm-3">
                 <!-- -->
             </div>
 
+            <!-- user input -->
             <div class="col-sm-5">
                 <hover title="Speak">
                     <div class="form-group">
-                        <!-- <input id="route_number" onkeyup="pred1()" class="form-control" type="text" placeholder="e.g. 46A" name="busnum_var" required> -->
                         <div class="ui-widget"> <!-- jQuery autocomplete UI -->
-                            <input id="user_query" class="form-control" type="text" placeholder="Hey Oracle!" name="busnum_var" required>
+                            <input id="user_query" class="form-control" type="text" placeholder="Hey Oracle!" name="query_var" required>
                         </div>
                     </div>
                 </hover>
@@ -98,6 +100,7 @@
 
     <!-- the response rendered by back end Django will be inserted here by jQuery AJAX call -->
     <div id="response"></div>
+
 </div>
 
 <br/>
