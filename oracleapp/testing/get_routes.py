@@ -1,4 +1,4 @@
-from base.settings import STATIC_ROOT
+from busy.settings import STATIC_ROOT
 from django.http import HttpResponse
 
 def busRoutesNew(num):

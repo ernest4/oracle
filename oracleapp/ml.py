@@ -8,7 +8,7 @@ import time
 import psycopg2
 from pprint import pprint
 from sklearn.externals import joblib
-from base.settings import STATIC_ROOT
+from busy.settings import STATIC_ROOT
 import requests
 import datetime
 import os

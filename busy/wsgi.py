@@ -1,5 +1,5 @@
 """
-WSGI config for base project.
+WSGI config for busy project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -12,7 +12,7 @@ import os
 from django.core.wsgi import get_wsgi_application
 from whitenoise.django import DjangoWhiteNoise
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "base.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "busy.settings")
 
 application = get_wsgi_application()
 application = DjangoWhiteNoise(application)

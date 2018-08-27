@@ -21,7 +21,7 @@ from .ml import getWeekDayBinaryArray
 from .ml import getWeather
 from .ml import getModelAndProgNum
 
-from base.settings import STATIC_ROOT
+from busy.settings import STATIC_ROOT
 
 # Create dictionary object for events from csv file
 
