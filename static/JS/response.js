@@ -2,7 +2,7 @@ $( window ).on( "load", function() {
 
 
     //_________________________________________ONTHEGO
-    $( "#onthego_form" ).on('submit', function(event){
+    $( "#oracle_form" ).on('submit', function(event){
         event.preventDefault();
         createResponseOnTheGo();
     });

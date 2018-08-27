@@ -33,7 +33,7 @@ class ModelTest(TestCase):
 
 
     def test_getProgNum(self):
-        with open('static/bus_data/routes.json') as f:
+        with open('static/bus_data/words.json') as f:
             data = json.load(f)
 
             self.assertEqual(ml.getProgNum(data, '46A', 'I', 2795), 12)

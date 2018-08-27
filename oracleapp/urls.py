@@ -21,7 +21,7 @@ urlpatterns = [
     path('routeinfo', views.routeInfo, name="routeinfo"),
     path('busstops', views.busStops, name="busstops"),
     path('autocomp', views.busStopAutosuggest, name="autocomp_stops"),
-    path('autocomp/routes', views.busRoutesAutosuggest, name="autocomp_routes"),
+    path('autocomp/query', views.queryAutosuggest, name="autocomp_routes"),
     path('loaderio-66417165d8f4c651a7a4a33b4dd4c867.txt', views.loadTest, name="loaderio"),
     path('directions', views.directions, name="directions"),
 ]

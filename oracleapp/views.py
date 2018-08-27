@@ -122,8 +122,10 @@ def busStopAutosuggest(request):
         return HttpResponse("format=" + params['format']+ ", operator=" + params['operator']+ ", stopname=" + params['stopname'])
 
 
-def busRoutesAutosuggest(request):
-    with open(STATIC_ROOT+'/bus_data/routes.json', 'r') as file:
+knownWords = Path(STATIC_ROOT+'/knownWords')
+words = knownWords / 'words.json' #Using the special ' / ' path notation from Pathlib
+def queryAutosuggest(request):
+    with open(words, 'r') as file:
         return HttpResponse(file.read())
 
 

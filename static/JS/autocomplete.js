@@ -1,57 +1,21 @@
-
-// FUNCTION TO PROVIDE AUTOFILL ON LOCATION SEARCHES
-
 $( window ).on ("load", function () {
-
-    //set the autocomplete callback for destination autosuggest powered by directions api
-
-
-    //==================================================================================================================
-$("#destination").each(function(){     //#location_from,#location_to,
-    $(this).autocomplete({
+    // Set the autocomplete for user query
+    $( "#user_query" ).autocomplete({
         source: function(request, response){
-            var availableTags = [];
+            var availableWords = [];
 
-            var to_input = request.term; //This is the user input
+            var input_word = request.term; //This is the user input
 
-            $.getJSON( "/autocomp" + "?format=json&operator=bac&stopname="+to_input, function(data) {
+            $.getJSON( "/autocomp/query", function(data) {
 
-                _.forEach(data.results, function(busStops){
-                    availableTags.push({ label: busStops.fullname+" "+busStops.stopid, value: busStops.latitude+","+busStops.longitude });
-                });
-                response(availableTags);
+                _.forEach(data, function(word){
 
-            }).done(function(){
-                //
-            }).fail(function(){
-                alert("failed autosuggest");
-            }).always(function(){
-                //
-            });
-        },
-        minLength: 3 //Number of characters after which the autosuggest should start...
-    });
-});
-
-    //==================================================================================================================
-
-    // Set the autocomplete for bus routes from GTFS routes file
-    $( "#bus_number" ).autocomplete({
-        source: function(request, response){
-            var availableTags = [];
-
-            var bus_num_input = request.term; //This is the user input
-
-            $.getJSON( "/autocomp/routes", function(data) {
-
-                _.forEach(data, function(busRoute){
-
-                    // Only add busRoute as tag if it starts with input
-                    if (busRoute.startsWith(bus_num_input)) {
-                        availableTags.push({label: busRoute, value: busRoute});
+                    // Only add to suggestion list if it starts with the input word
+                    if (word.startsWith(input_word)) {
+                        availableWords.push({label: word, value: word});
                     }
                 });
-                response(availableTags);
+                response(availableWords);
 
             }).done(function(){
                 //
