@@ -10,6 +10,7 @@ import csv
 #import googlemaps
 import json
 import urllib
+from pathlib import Path
 
 from .forms import OnTheGoForm, PlannerForm, TouristForm
 from .ml import predictor_ann_improved
@@ -24,14 +25,14 @@ from base.settings import STATIC_ROOT
 
 # Create dictionary object for events from csv file
 
-with open(STATIC_ROOT+'/model_info/events18.csv', mode='r') as infile:
-    reader = csv.reader(infile)
-    events = {rows[0]:[rows[1],rows[2],rows[3],rows[4],rows[5],rows[6]] for rows in reader}
+#model_info_events18_file = Path('model_info/events18.csv')
+#with open(STATIC_ROOT + 'model_info/events18.csv', mode='r') as infile:
+#    reader = csv.reader(infile)
+#    events = {rows[0]:[rows[1],rows[2],rows[3],rows[4],rows[5],rows[6]] for rows in reader}
 
 # Create your views here.
 def oracleIndex(request):
-    return HttpResponse('HI, Oracle here!')
-    #return render(request, 'index.html')
+    return render(request, 'index.html')
 
 def index(request):
     return render(request, 'index.html')

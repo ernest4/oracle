@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class OracleappConfig(AppConfig):
+class OracleAppConfig(AppConfig):
     name = 'oracleapp'
