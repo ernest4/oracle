@@ -12,7 +12,7 @@ $( window ).on( "load", function() {
 
             success: function(response) {
                 document.getElementById('response').innerHTML = response; //more efficient than using jQuery equivalent...
-                document.getElementById('response').scrollIntoView();
+                //document.getElementById('response').scrollIntoView();
 
                 //Extra stuff
                 //Make the feedback disappear when Yes or No button pressed
