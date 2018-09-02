@@ -35,7 +35,7 @@ def oracleIndex(request):
     return render(request, 'index.html')
 
 def index(request):
-    return render(request, 'index.html')
+    return render(request, 'index_old.html')
 
 def onthego(request):
     return render(request, 'onthego.html')
