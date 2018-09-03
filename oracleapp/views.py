@@ -32,7 +32,7 @@ from busy.settings import STATIC_ROOT
 
 # Create your views here.
 def oracleIndex(request):
-    return render(request, 'index.html')
+    return render(request, 'index_old.html')
 
 def index(request):
     return render(request, 'index_old.html')

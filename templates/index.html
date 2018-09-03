@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Learning Bootstrap</title>
+        <title>My Oracle</title>
+
+        {% load static %}
+
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
@@ -13,42 +16,6 @@
     <body>
         <div id="root"></div>
 
-        <script type="text/babel">
-            
-            class Hello extends React.Component {
-                constructor(props) {
-                    super(props); //initializes 'this' keyword
-
-                    this.state = {
-                        message: "my friend (from state)!"
-                    };
-
-                    //bind 'this' keyword to updateMessage() in order to allow updateMessage()
-                    //to have access to 'this' keyword within its method body.
-                    this.updateMessage = this.updateMessage.bind(this);
-                }
-
-                updateMessage() {
-                    this.setState({
-                        message: "my friend (from changed state)!"
-                    });
-                }
-
-                render() {
-                    return (
-                        <div>
-                            <h1>Hello {this.state.message}</h1>
-                            <button onClick={this.updateMessage}>Click Me!</button>
-                        </div>
-                    );
-                }
-            }
-
-            ReactDOM.render(
-                <Hello message="my friend"/>,
-                document.getElementById("root")
-            );
-
-        </script>
+        <script type="text/babel" src="{% static 'JS/app.js' %}" ></script>
     </body>
 </html>

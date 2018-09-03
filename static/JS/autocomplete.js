@@ -5,6 +5,11 @@ $( window ).on ("load", function () {
             var availableWords = [];
 
             var input_word = request.term.toLowerCase(); //This is the user input
+            let input_words = request.term.toLowerCase().split(" ");
+
+            //EXPERIMENTAL
+            document.getElementById("user_query").style.color = "green";
+            //EXPERIMENTAL
 
             $.getJSON( "/autocomp/query" + "?word=" + input_word, function(wordDict) {
 
