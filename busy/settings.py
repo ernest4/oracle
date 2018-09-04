@@ -47,7 +47,15 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'oracleapp.apps.OracleAppConfig',
+    #'webpack_loader',
 ]
+
+#WEBPACK_LOADER = {
+#    'DEFAULT': {
+#            'BUNDLE_DIR_NAME': '',
+#            'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+#        }
+#}
 
 #SECURE_SSL_REDIRECT = True
 SECURE_SSL_REDIRECT = False #FOR LOCAL TESTING, SET IT TRUE WHEN DEPLOYING FOR HTTPS TO WORK
@@ -68,7 +76,8 @@ ROOT_URLCONF = 'busy.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        #'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates'), os.path.join(BASE_DIR, 'frontend/build')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
