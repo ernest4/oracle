@@ -48,6 +48,7 @@ def queryAutosuggest(request):
 
         return HttpResponse(wordsFile.read())
 
+
 def oracleResponse(request):
     params = request.GET
     text = params['text']
@@ -66,8 +67,12 @@ def oracleResponse(request):
 
 
     # Construct the response
-    answer = " That's a tricky one, let me think for a bit..."
-    answer = text+answer+answer+answer+answer+answer+answer+answer
+
+    if text == "Hey":
+        answer = "Hi"
+    else:
+        answer = " That's a tricky one, let me think for a bit..."
+        answer = text+answer
 
     responseObject = {'text' : answer}
 
