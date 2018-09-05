@@ -1,20 +1,26 @@
 import React, { Component } from 'react';
 import {Grid, Row, Col, Image, Button, Panel} from 'react-bootstrap';
-import SubmitButton from './submitbutton';
 import logo from './images/logo.svg';
 import myoracle from './images/myoracle.png'
-import ContentEditable from "react-contenteditable";
 import './App.css';
 import {PanelResult, YesButton, NoButton} from './results.js';
 import {PanelBlack, PanelGreen, PanelBlue, PanelRed, PanelCat} from './panels.js';
 import Footer from './footer.js';
+import ContentEditable from 'react-contenteditable';
+
+
 
 class App extends Component {
-
   constructor(props){
     super(props);
 
-    this.state = { inputtext: "Let's chat!", responsetext: 'hi' };
+    this.handleClick = this.submitUserQuery.bind(this);
+
+    this.state = {gotResult: false,
+                  inputtext: "Let's chat!",
+                  responsetext: '',
+                  isLoading: false,
+                  firstInput: true };
   }
 
   handleInput = evt => {
@@ -37,6 +43,26 @@ class App extends Component {
     //this.setState({ inputtext: finalString});
     this.setState({ inputtext: wordList.join(' ')});
   };
+
+  
+  submitUserQuery(text = "") {
+    this.setState({ isLoading: true });
+
+    fetch(`/query/response?text=${text}`, {
+        method: "GET",
+        dataType: "JSON",
+        mode: 'cors',
+    })
+    .then( response => response.json() )
+    .then((data) => {
+      console.log(data); //TESTING...
+      console.log(data.text); //TESTING...
+      this.setState({ isLoading: false, gotResult: true, responsetext: data.text });
+    })
+    .catch((error) => {
+        console.log(error, "THERE WAS AN ERROR");
+    });
+  }
 
   render() {
     return (
@@ -99,10 +125,19 @@ class App extends Component {
               <ContentEditable html={this.state.inputtext} //innerHTML of the editable div
                                   disabled={false} //use true to disable editting
                                   onChange={this.handleInput} //handle innerHTML change
+                                  onClick={() => { if (this.state.firstInput == true) {
+                                    this.setState({ firstInput: false, inputtext: '' });
+                                  }}}
                                   />
             </Col>
             <Col sm={1}>
-              <SubmitButton />
+            <Button
+                bsStyle="primary"
+                disabled={this.state.isLoading}
+                onClick={!this.state.isLoading ? () => this.submitUserQuery(this.state.inputtext) : null} //Only allow clicking once done with first request
+              >
+              {this.state.isLoading ? 'Thinking...' : 'Say'}
+            </Button>
             </Col>
             <Col sm={3}>
               {/*space*/}
