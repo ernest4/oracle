@@ -7,6 +7,7 @@ import {PanelResult, YesButton, NoButton} from './results.js';
 import {PanelBlack, PanelGreen, PanelBlue, PanelRed, PanelCat} from './panels.js';
 import Footer from './footer.js';
 import ContentEditable from 'react-contenteditable';
+import scrollToComponent from 'react-scroll-to-component';
 
 
 
@@ -128,13 +129,18 @@ class App extends Component {
                                   onClick={() => { if (this.state.firstInput == true) {
                                     this.setState({ firstInput: false, inputtext: '' });
                                   }}}
+                                  className="UserContent"
+                                  ref={(ContentEditable) => {this.UserContent = ContentEditable;}}
                                   />
             </Col>
             <Col sm={1}>
             <Button
                 bsStyle="primary"
                 disabled={this.state.isLoading}
-                onClick={!this.state.isLoading ? () => this.submitUserQuery(this.state.inputtext) : null} //Only allow clicking once done with first request
+                onClick={!this.state.isLoading ? () => {
+                  scrollToComponent(this.UserContent);
+                  return this.submitUserQuery(this.state.inputtext)
+                } : null} //Only allow clicking once done with first request
               >
               {this.state.isLoading ? 'Thinking...' : 'Say'}
             </Button>

@@ -11,6 +11,7 @@ import csv
 import json
 import urllib
 from pathlib import Path
+from . import word_processing
 
 from .forms import OnTheGoForm, PlannerForm, TouristForm, OracleForm
 from .ml import predictor_ann_improved
@@ -53,28 +54,14 @@ def oracleResponse(request):
     params = request.GET
     text = params['text']
 
-    # DO SOME CLEAN UP....
-
-    # FEED INTO MACHINE LEARNING MODEL TO DISCERN THE SENTIMENT OF THE SENTENCE
-    # sentimentAnalyzer = getSentimentModel(text)
-    sentimentAnalyzer = None
-
-    if sentimentAnalyzer is None:  # Model could not be retrieved
-        pass
-    else: # call the machine learning function & parse query
-        #sentimentScore = sentimentAnalyzer(text=text)
-        sentimentScore = 0 #0 == neutral, i.e. no sentiment
-
+    # Do some clean up
+    text = text.lower()
+    sentiment = word_processing.analyzeSentiment(text)
+    tokensArray = word_processing.processInputText(text)
 
     # Construct the response
-
-    if text == "Hey":
-        answer = "Hi"
-    else:
-        answer = " That's a tricky one, let me think for a bit..."
-        answer = text+answer
-
-    responseObject = {'text' : answer}
+    response, debug = word_processing.generateResponse(tokensArray, sentiment)
+    responseObject = {'text' : response, 'debug': debug}
 
     return JsonResponse(responseObject)
 

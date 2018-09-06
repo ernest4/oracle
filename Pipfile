@@ -18,5 +18,6 @@ scipy = "*"
 requests = "*"
 dj-database-url = "*"
 googlemaps = "*"
+nltk = "*"
 
 [dev-packages]
