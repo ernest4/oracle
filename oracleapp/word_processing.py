@@ -45,71 +45,85 @@ class Graph:
         return returnStr
 
 
-def buildWordsGraph():
-    knownWords = Path(BASE_DIR + '/static' + '/knownWords')
-    words = knownWords / 'wordsGraph'  # Using the special ' / ' path notation from Pathlib
+def generateDict(setOfKnownWords):
+    '''
+    Generates a dictionary of known words optimized for the autosuggest for the front end text input.
+    :return: status
+    '''
 
-    wordsGraph = Graph()
+    wordsDict = {}
 
-    for i in "abcdefghij":
-        wordsGraph.setVertex(i)
+    #Generate first letter keys
+    for letter in 'abcdefghijklmnopqrstuvwxyz':
+        wordsDict[letter] = []
 
-    wordsGraph.setVertex("what")
-    wordsGraph.setVertex("'s")
-    wordsGraph.setVertex("up")
-    wordsGraph.setVertex("?")
-    wordsGraph.setEdge("what", ["'s"], [1])
-    wordsGraph.setEdge("'s", ["up"], [1])
-    wordsGraph.setEdge("up", ["?"], [1])
+    #pupulate from the known set
+    for word in setOfKnownWords:
+        firstLetter = word[0]
+        wordsDict[firstLetter].append(word) #e.g. wordsDict['y'].append('you')
 
-    #Branching converstation
-    wordsGraph.setVertex("i")
-    wordsGraph.setVertex("you")
+    #Write results to file
+    knownWordsFolder = Path(BASE_DIR + '/static' + '/knownWords')
+    knownWordsJSON = knownWordsFolder / 'wordsAutosuggest.json'  # Using the special ' / ' path notation from Pathlib
 
-    wordsGraph.setVertex("alive")
-
-    wordsGraph.setEdge("alive", ["i", "you"], [0, 1])
-
-    wordsGraph.setVertex("Yes you are. :)")
-    wordsGraph.setVertex("I'm not, I'm just software. :'(")
-
-    wordsGraph.setEdge("alive", ["Yes you are. :)", "I'm not, I'm just software. :'("], [10, 11])
-
-
-    with open(words, 'wb') as wordsFile:
-        pickle.dump(wordsGraph, wordsFile)
+    with open(knownWordsJSON, 'w') as wordsJSON:
+        json.dump(wordsDict, wordsJSON)
 
     return 0
 
-#buildWordsGraph()
+
+def buildWordsGraph():
+    '''
+    Generates the graph of known words and a set of known words.
+
+    :return: status
+    '''
+
+    wordsGraph = Graph()
+    knownWordsSet = set()
+    escapeWordsSet = set()
+
+    #Branching converstation
+    wordsGraph.setVertex("i")
+    knownWordsSet.add("i")
+    wordsGraph.setVertex("you")
+    knownWordsSet.add("you")
+
+    wordsGraph.setVertex("alive")
+    knownWordsSet.add("alive")
+    escapeWordsSet.add("alive")
+
+    wordsGraph.setEdge("alive", ["i", "you"], [0, 1])
+
+    wordsGraph.setVertex(" Yes you are alive :)")
+    wordsGraph.setVertex(" No I'm not alive, I'm just software. :'(")
+
+    wordsGraph.setEdge("alive", [" Yes you are alive :)", " No I'm not alive, I'm just software. :'("], [10, 11])
+
+    # Write results to file
+    knownWordsFolder = Path(BASE_DIR + '/static' + '/knownWords')
+    wordsGraphFile = knownWordsFolder / 'wordsGraph'  # Using the special ' / ' path notation from Pathlib
+    knownWordsSetFile = knownWordsFolder / 'knownWordsSet'  # Using the special ' / ' path notation from Pathlib
+    escapeWordsSetFile = knownWordsFolder / 'escapeWordsSet'  # Using the special ' / ' path notation from Pathlib
+
+    with open(wordsGraphFile, 'wb') as wordsGraphFileHandle:
+        pickle.dump(wordsGraph, wordsGraphFileHandle)
+
+    with open(knownWordsSetFile, 'wb') as knownWordsSetFileHandle:
+        pickle.dump(knownWordsSet, knownWordsSetFileHandle)
+
+    with open(escapeWordsSetFile, 'wb') as escapeWordsSetFileHandle:
+        pickle.dump(escapeWordsSet, escapeWordsSetFileHandle)
+
+    if generateDict(knownWordsSet) > 0: #Generate the autosuggest dictionary based on the words set above
+        return 1
+
+    return 0
+
+if buildWordsGraph() == 0: #all good
+    print("Words Graph finished building")
 
 
-def generateDict():
-    with open('../static/knownWords/words.json', 'w') as wordsFile:
-        wordsDict = {}
-
-        for letter in 'abcdefghijklmnopqrstuvwxyz':
-            wordsDict[letter] = []
-
-        wordsDict['y'].append('you')
-
-        for number in range(10000):
-            wordsDict['d'].append("d" + str(number))
-
-        for number in range(1000):
-            wordsDict['i'].append("i" + str(number))
-
-        for number in range(100):
-            wordsDict['h'].append("h" + str(number))
-
-        for number in range(10):
-            wordsDict['t'].append("t" + str(number))
-
-        print(wordsDict)
-
-        json.dump(wordsDict, wordsFile)
-
-#generateDict()
 
 #__init__.py has extra nltk initilization
 def processInputText(text):
@@ -131,40 +145,79 @@ def analyzeSentiment(text):
         sentimentScore = 0  # 0 == neutral, i.e. no sentiment
         return sentimentScore
 
+
 def generateResponse(tokens, sentiment = 0):
+    global knownWordsSet
     response = ''
     debug = {'tokens': tokens}
+    debug['skipped_tokens'] = []
 
-    #knownWords = Path(STATIC_ROOT + '/knownWords') #FOR PRODUCTION !!!! UNCOMMENT BEFORE PUSHING TO HEROKU !!!!
-    knownWords = Path(BASE_DIR + '/static' + '/knownWords') #FOR DEVELOPMENT !!!! COMMENT OUT BEFORE PUSHING TO HEROKU !!!!
+    sentences = []
+    sentence = []
+    for token in tokens:
+        if token in [".", "?", "!"]:
+            sentences.append(sentence)
+            sentence = []
+        else:
+            sentence.append(token)
 
-    words = knownWords / 'wordsGraph'  # Using the special ' / ' path notation from Pathlib
+    if sentences == []: #only sentense found with no full stop - . ? !
+        sentences.append(sentence) #Put that sentence in
+
+    debug['sentences'] = sentences
+
+
+    #knownWordsFolder = Path(STATIC_ROOT + '/knownWords') #FOR PRODUCTION !!!! UNCOMMENT BEFORE PUSHING TO HEROKU !!!!
+    knownWordsFolder = Path(BASE_DIR + '/static' + '/knownWords') #FOR DEVELOPMENT !!!! COMMENT OUT BEFORE PUSHING TO HEROKU !!!!
+
+    wordsGraphFile = knownWordsFolder / 'wordsGraph'  # Using the special ' / ' path notation from Pathlib
+    knownWordsSetFile = knownWordsFolder / 'knownWordsSet'  # Using the special ' / ' path notation from Pathlib
+    escapeWordsSetFile = knownWordsFolder / 'escapeWordsSet' # Using the special ' / ' path notation from Pathlib
+
     wordsGraph = {}
-    with open(words, 'rb') as wordsFile:
-        wordsGraph = pickle.load(wordsFile)
+    with open(wordsGraphFile, 'rb') as wordsGraphFileHandle:
+        wordsGraph = pickle.load(wordsGraphFileHandle)
+
+    knownWordsSet = set()
+    with open(knownWordsSetFile, 'rb') as knownWordsSetFileHandle:
+        knownWordsSet = pickle.load(knownWordsSetFileHandle)
+
+    escapeWordsSet = set()
+    with open(escapeWordsSetFile, 'rb') as escapeWordsSetFileHandle:
+        escapeWordsSet = pickle.load(escapeWordsSetFileHandle)
+
+    debug['escape_words_set'] = list(escapeWordsSet)
+    debug['known_words_set'] = list(knownWordsSet)
 
     #TESTING
-    knownWordsSet = set()
-    for index, currentToken in enumerate(tokens):
-        if index == 0:
+    debug['unknown_tokens'] = []
+    for sentence in sentences:
+        for index, currentToken in enumerate(sentence):
+            if index == 0:
+                previousToken = currentToken
+                continue
+
+            if previousToken not in knownWordsSet: #don't recognise the word, then skip it
+                debug['unknown_tokens'].append(previousToken)
+                previousToken = currentToken
+                continue
+
+            if currentToken in wordsGraph.getNeighbours(previousToken):
+                previousEdgeCost = wordsGraph.getEdge(previousToken, currentToken)
+
+                if currentToken in escapeWordsSet: #Prepare the response
+                    debug['escape_token'] = currentToken
+                    for neighbour in wordsGraph.getNeighbours(currentToken):
+                        if wordsGraph.getEdge(currentToken, neighbour) == previousEdgeCost + 10: #response found
+                            response += neighbour
+                            break
+            else:
+                debug['skipped_tokens'].append(currentToken)
+                continue
+
             previousToken = currentToken
-            continue
-
-        if currentToken in wordsGraph.getNeighbours(previousToken):
-            previousEdgeCost = wordsGraph.getEdge(previousToken, currentToken)
-
-            if isEscapeWord(currentToken): #Prepare the response
-                debug['escape_token'] = currentToken
-                for neighbour in wordsGraph.getNeighbours(currentToken):
-                    if wordsGraph.getEdge(currentToken, neighbour) == previousEdgeCost + 10: #response found
-                        response = neighbour
-                        break
 
     if response == '': #No answer was found anywhere
         response = "I have trouble understanding, could you please rephrase for me."
 
     return response, debug
-
-def isEscapeWord(token):
-    if token in ['alive', 'find', 'make']:
-        return True

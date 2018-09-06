@@ -37,7 +37,7 @@ def oracleIndex(request):
 
 
 knownWords = Path(STATIC_ROOT+'/knownWords')
-words = knownWords / 'words.json' #Using the special ' / ' path notation from Pathlib
+words = knownWords / 'wordsAutosuggest.json' #Using the special ' / ' path notation from Pathlib
 def queryAutosuggest(request):
     #return JsonResponse({ 'words': ['word1', 'word2', 'word3'] })
     #params = request.GET
