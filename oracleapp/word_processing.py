@@ -130,7 +130,7 @@ def processInputText(text):
     tokens = nltk.word_tokenize(text)
     return tokens
 
-#print(processInputText("I haven't decided yet if you're the right, or if the dog gets his. What's up?"))
+print(processInputText('<span style="color: green;"><b>you</b></span>'))
 
 def analyzeSentiment(text):
     # FEED INTO MACHINE LEARNING MODEL TO DISCERN THE SENTIMENT OF THE SENTENCE

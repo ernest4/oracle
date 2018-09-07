@@ -8,6 +8,7 @@ import {PanelBlack, PanelGreen, PanelBlue, PanelRed, PanelCat} from './panels.js
 import Footer from './footer.js';
 import ContentEditable from 'react-contenteditable';
 import scrollToComponent from 'react-scroll-to-component';
+import {Green} from './texthighlights.js';
 
 
 
@@ -24,7 +25,39 @@ class App extends Component {
                   firstInput: true };
   }
 
+  componentDidMount() {
+    //var el = document.getElementById("userInput");
+    //var range = document.createRange();
+    //var sel = window.getSelection();
+
+    //range.setStart(el.childNodes[0], 6);
+    //range.collapse(true);
+    //sel.removeAllRanges();
+    //sel.addRange(range);
+
+    /*window.setTimeout(function () { 
+      el.childNodes[0].focus();
+    }, 0); */
+
+   //el.childNodes[0].focus();
+  }
+
+  setCaretPosition(position) {
+    var el = document.getElementById("userInput");
+    var range = document.createRange();
+    var sel = window.getSelection();
+
+    console.log(el.childNodes, el.childNodes.length);
+
+    range.setStart(el.childNodes[2], 0);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+
   handleInput = evt => {
+    let offset = false;
     console.log(evt.target.value);
 
     let wordList = evt.target.value.split(" ");
@@ -33,16 +66,25 @@ class App extends Component {
     for (let i = 0; i < wordList.length; i++){
       //coloring text
       if (wordList[i] === "you") {
-        wordList[i] = `<span style="color: green;"><b>${wordList[i]}</b></span>`;
+        offset = true;
+        //wordList[i] = `<Green word="${wordList[i]}"/>`;
+        wordList[i] = `<span style='color: green;'><b>${wordList[i]}</b></span> `;
+        //DO NOTHING FOR NOW...COME BACK TO THE FEATURE LATER
       }
-      console.log(`index: ${i} word: ${wordList[i]}`)
+      console.log(`offset: ${offset} index: ${i} word: ${wordList[i]}`)
 
       //finalString += wordList[i];
     }
 
+    //console.log("DOM: "+document.getElementById("userInput").innerHTML);
+
     //this.setState({ inputtext: evt.target.value});
     //this.setState({ inputtext: finalString});
-    this.setState({ inputtext: wordList.join(' ')});
+    this.setState({ inputtext: wordList.join(' ')}, () => {
+      if (offset == true) {
+        this.setCaretPosition();
+      }
+    });
   };
 
   
@@ -131,6 +173,8 @@ class App extends Component {
                                   }}}
                                   className="UserContent"
                                   ref={(ContentEditable) => {this.UserContent = ContentEditable;}}
+
+                                  id="userInput"
                                   />
             </Col>
             <Col sm={1}>
