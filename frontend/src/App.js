@@ -19,10 +19,11 @@ class App extends Component {
     this.handleClick = this.submitUserQuery.bind(this);
 
     this.state = {gotResult: false,
-                  inputtext: "Let's chat!",
+                  rawInputText: "Let's chat!", //for front end with formating e.g. <span>...
+                  inputText: "", //for sending to back end, pure text, no HTML elementes.
                   responsetext: '',
                   isLoading: false,
-                  firstInput: true };
+                  firstInput: true};
   }
 
   componentDidMount() {
@@ -43,13 +44,14 @@ class App extends Component {
       }
     });
     //console.log(`words regex: ${knownWordsRegExpStr}`); //DEBUGGING
-    let knownWordsRegExpFinder = new RegExp(`\\b(${knownWordsRegExpStr})(?=[^\\w])`,"g");
-    let knownWordsRegExpValidator = new RegExp(`\\b(${knownWordsRegExpStr})`,"g");
+    let knownWordsRegExpFinder = new RegExp(`\\b(${knownWordsRegExpStr})(?=[^\\w])`,"gi");
+    let knownWordsRegExpValidator = new RegExp(`\\b(${knownWordsRegExpStr})`,"gi");
 
 
     let offsetCursor = false;
-    let finalString = '';
-    console.log(`handleInput:: incoming string: ${evt.target.value}`); //DEBUGGING
+    let finalRawString = ''; //for front end with formating e.g. <span>...
+    let finalInputTextString = ''; //for sending to back end, pure text, no HTML elementes.
+    //console.log(`handleInput:: incoming string: ${evt.target.value}`); //DEBUGGING
 
     //console.log(`:___${evt.nativeEvent.data}___:`); //DEBUGGING
     /*if (evt.nativeEvent.data !== " ") {
@@ -60,46 +62,47 @@ class App extends Component {
     let range = document.createRange();
     //let lastNode = userInput.childNodes.length;
 
-    let SPAN = 1;
+    let SPAN = 1; //or FONT
     let TEXT = 3;
     console.log(`handleInput:: child nodes: `, userInput.childNodes); //DEBUGGING
 
     userInput.childNodes.forEach((node, index) => {
+      let text = node.textContent;
       if (node.nodeType === TEXT) {
-        console.log(`Processing text: :__${node.textContent}__:`); //DEBUGGING
-        finalString += processText(node.textContent);
+        console.log(`Processing text: :__${text}__:`); //DEBUGGING
+        finalRawString += processText(text);
+        finalInputTextString += text;
       } else if (node.nodeType === SPAN) {
-        console.log(`Processing keyword: :__${node.textContent}__:`); //DEBUGGING
+        console.log(`Processing keyword: :__${text}__:`); //DEBUGGING
         //console.log("Processing keyword: ",node); //DEBUGGING
 
         //finalString += validateSPAN(node);
         //finalString += node.outerHTML;
 
         //finalString += processText(node.textContent);
-        finalString += validateSPAN(node.textContent);
+        finalRawString += validateSPAN(text);
+        finalInputTextString += text;
         //finalString += processText(node.outerHTML);
       }
     });
 
-    this.setState({ inputtext: finalString }, () => {
-      /*if (offsetCursor) {
-        setCaretPosition();
-      }*/
+    this.setState({ rawInputText: finalRawString, inputText: finalInputTextString }, () => {
+      console.log(`FOR BACKE END: ${this.state.inputText}`); //DEBUGGING
       setCaretPosition();
     });
 
     function processText(text) {
       //REGEXP WAY
       let parsed = text.replace(knownWordsRegExpFinder,'<span style="color: green;"><b>$1</b></span><text></text>');
-      //parsed = parsed.replace(unknownWordsRegExp,'<span style="color: red;"><b>$1</b></span>');
-      //parsed = parsed.replace(learnWordsRegExp,'<span style="color: blue;"><b>$1</b></span>');
+      //parsed = parsed.replace(unknownWordsRegExp,'<span style="color: red;"><b>$1</b></span><text></text>');
+      //parsed = parsed.replace(learnWordsRegExp,'<span style="color: blue;"><b>$1</b></span><text></text>');
       return parsed;
     }
 
     function validateSPAN(text) {
       let parsed = text.replace(knownWordsRegExpValidator,'<span style="color: green;"><b>$1</b></span><text></text>');
-      //parsed = parsed.replace(unknownWordsRegExp,'<span style="color: red;"><b>$1</b></span>');
-      //parsed = parsed.replace(learnWordsRegExp,'<span style="color: blue;"><b>$1</b></span>');
+      //parsed = parsed.replace(unknownWordsRegExp,'<span style="color: red;"><b>$1</b></span><text></text>');
+      //parsed = parsed.replace(learnWordsRegExp,'<span style="color: blue;"><b>$1</b></span><text></text>');
       return parsed;
     }
 
@@ -108,11 +111,15 @@ class App extends Component {
       let range = document.createRange();
       let sel = window.getSelection();
       let lastNode = userInput.childNodes.length-1;
+
+      let caretLastPos = sel.getRangeAt(0).endOffset;
   
       // TESTING
       console.log("setCaretPosition:: ",userInput.childNodes,
-                  "Child Nodes Lenght: ",userInput.childNodes.length,
-                  "Last Node: ", lastNode);
+                  "Child Nodes Number: ",userInput.childNodes.length,
+                  "Last Node: ", lastNode,
+                  "Caret Last Position: ", caretLastPos,
+                  "Sel Range Count: ", sel.rangeCount);
   
       //range.setStart(userInput.childNodes[lastNode-1], 1);
       range.setStart(userInput.childNodes[lastNode], userInput.childNodes[lastNode].textContent.length);
@@ -200,11 +207,14 @@ class App extends Component {
               {/*space*/}
             </Col>
             <Col sm={5}>
-              <ContentEditable html={this.state.inputtext} //innerHTML of the editable div
+              <ContentEditable html={this.state.rawInputText} //innerHTML of the editable div
                                   disabled={false} //use true to disable editting
-                                  onChange={this.handleInput} //handle innerHTML change
+                                  //onChange={this.handleInput} //handle innerHTML change
+
+                                  onChange={() => {setTimeout(this.handleInput, 3000)}} //delay to improve performance
+
                                   onClick={() => { if (this.state.firstInput === true) {
-                                    this.setState({ firstInput: false, inputtext: '' });
+                                    this.setState({ firstInput: false, rawInputText: '' });
                                   }}}
                                   className="UserContent"
                                   ref={(ContentEditable) => {this.UserContent = ContentEditable;}}
@@ -218,7 +228,7 @@ class App extends Component {
                 disabled={this.state.isLoading}
                 onClick={!this.state.isLoading ? () => {
                   scrollToComponent(this.UserContent);
-                  return this.submitUserQuery(this.state.inputtext)
+                  return this.submitUserQuery(this.state.inputText);
                 } : null} //Only allow clicking once done with first request
               >
               {this.state.isLoading ? 'Thinking...' : 'Say'}
