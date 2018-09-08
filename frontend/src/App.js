@@ -26,65 +26,100 @@ class App extends Component {
   }
 
   componentDidMount() {
-    //var el = document.getElementById("userInput");
-    //var range = document.createRange();
-    //var sel = window.getSelection();
-
-    //range.setStart(el.childNodes[0], 6);
-    //range.collapse(true);
-    //sel.removeAllRanges();
-    //sel.addRange(range);
-
-    /*window.setTimeout(function () { 
-      el.childNodes[0].focus();
-    }, 0); */
-
-   //el.childNodes[0].focus();
-  }
-
-  setCaretPosition(position) {
-    var el = document.getElementById("userInput");
-    var range = document.createRange();
-    var sel = window.getSelection();
-
-    console.log(el.childNodes, el.childNodes.length);
-
-    range.setStart(el.childNodes[2], 0);
-    range.collapse(true);
-    sel.removeAllRanges();
-    sel.addRange(range);
+    //pass
   }
 
 
   handleInput = evt => {
-    let offset = false;
-    console.log(evt.target.value);
+    //return; //DISABLE SYNTAX HIHLIGHTING
 
-    let wordList = evt.target.value.split(" ");
-    console.log(wordList);
-    //let finalString = "";
-    for (let i = 0; i < wordList.length; i++){
-      //coloring text
-      if (wordList[i] === "you") {
-        offset = true;
-        //wordList[i] = `<Green word="${wordList[i]}"/>`;
-        wordList[i] = `<span style='color: green;'><b>${wordList[i]}</b></span> `;
-        //DO NOTHING FOR NOW...COME BACK TO THE FEATURE LATER
-      }
-      console.log(`offset: ${offset} index: ${i} word: ${wordList[i]}`)
-
-      //finalString += wordList[i];
-    }
-
-    //console.log("DOM: "+document.getElementById("userInput").innerHTML);
-
-    //this.setState({ inputtext: evt.target.value});
-    //this.setState({ inputtext: finalString});
-    this.setState({ inputtext: wordList.join(' ')}, () => {
-      if (offset == true) {
-        this.setCaretPosition();
+    let knownWords = ["you", "me"];
+    let knownWordsRegExpStr = ""
+    knownWords.forEach((word, index) => {
+      if (index == knownWords.length-1) {
+        knownWordsRegExpStr += `${word}`;
+      } else {
+        knownWordsRegExpStr += `${word}|`;
       }
     });
+    //console.log(`words regex: ${knownWordsRegExpStr}`); //DEBUGGING
+    let knownWordsRegExpFinder = new RegExp(`\\b(${knownWordsRegExpStr})(?=[^\\w])`,"g");
+    let knownWordsRegExpValidator = new RegExp(`\\b(${knownWordsRegExpStr})`,"g");
+
+
+    let offsetCursor = false;
+    let finalString = '';
+    console.log(`handleInput:: incoming string: ${evt.target.value}`); //DEBUGGING
+
+    //console.log(`:___${evt.nativeEvent.data}___:`); //DEBUGGING
+    /*if (evt.nativeEvent.data !== " ") {
+      return;
+    }*/
+
+    let userInput = document.getElementById("userInput");
+    let range = document.createRange();
+    //let lastNode = userInput.childNodes.length;
+
+    let SPAN = 1;
+    let TEXT = 3;
+    console.log(`handleInput:: child nodes: `, userInput.childNodes); //DEBUGGING
+
+    userInput.childNodes.forEach((node, index) => {
+      if (node.nodeType === TEXT) {
+        console.log(`Processing text: :__${node.textContent}__:`); //DEBUGGING
+        finalString += processText(node.textContent);
+      } else if (node.nodeType === SPAN) {
+        console.log(`Processing keyword: :__${node.textContent}__:`); //DEBUGGING
+        //console.log("Processing keyword: ",node); //DEBUGGING
+
+        //finalString += validateSPAN(node);
+        //finalString += node.outerHTML;
+
+        //finalString += processText(node.textContent);
+        finalString += validateSPAN(node.textContent);
+        //finalString += processText(node.outerHTML);
+      }
+    });
+
+    this.setState({ inputtext: finalString }, () => {
+      /*if (offsetCursor) {
+        setCaretPosition();
+      }*/
+      setCaretPosition();
+    });
+
+    function processText(text) {
+      //REGEXP WAY
+      let parsed = text.replace(knownWordsRegExpFinder,'<span style="color: green;"><b>$1</b></span><text></text>');
+      //parsed = parsed.replace(unknownWordsRegExp,'<span style="color: red;"><b>$1</b></span>');
+      //parsed = parsed.replace(learnWordsRegExp,'<span style="color: blue;"><b>$1</b></span>');
+      return parsed;
+    }
+
+    function validateSPAN(text) {
+      let parsed = text.replace(knownWordsRegExpValidator,'<span style="color: green;"><b>$1</b></span><text></text>');
+      //parsed = parsed.replace(unknownWordsRegExp,'<span style="color: red;"><b>$1</b></span>');
+      //parsed = parsed.replace(learnWordsRegExp,'<span style="color: blue;"><b>$1</b></span>');
+      return parsed;
+    }
+
+    function setCaretPosition() {
+      let userInput = document.getElementById("userInput");
+      let range = document.createRange();
+      let sel = window.getSelection();
+      let lastNode = userInput.childNodes.length-1;
+  
+      // TESTING
+      console.log("setCaretPosition:: ",userInput.childNodes,
+                  "Child Nodes Lenght: ",userInput.childNodes.length,
+                  "Last Node: ", lastNode);
+  
+      //range.setStart(userInput.childNodes[lastNode-1], 1);
+      range.setStart(userInput.childNodes[lastNode], userInput.childNodes[lastNode].textContent.length);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
   };
 
   
@@ -168,7 +203,7 @@ class App extends Component {
               <ContentEditable html={this.state.inputtext} //innerHTML of the editable div
                                   disabled={false} //use true to disable editting
                                   onChange={this.handleInput} //handle innerHTML change
-                                  onClick={() => { if (this.state.firstInput == true) {
+                                  onClick={() => { if (this.state.firstInput === true) {
                                     this.setState({ firstInput: false, inputtext: '' });
                                   }}}
                                   className="UserContent"
