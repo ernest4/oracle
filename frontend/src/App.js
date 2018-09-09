@@ -4,7 +4,7 @@ import logo from './images/logo.svg';
 import myoracle from './images/myoracle.png'
 import './App.css';
 import {PanelResult, YesButton, NoButton} from './results.js';
-import {PanelBlack, PanelGreen, PanelBlue, PanelRed, PanelCat} from './panels.js';
+import {PanelBlack, PanelGreen, PanelBlue, PanelRed, PanelCat, PanelAutosuggest, AutoSuggestSection} from './panels.js';
 import Footer from './footer.js';
 import ContentEditable from 'react-contenteditable';
 import scrollToComponent from 'react-scroll-to-component';
@@ -23,7 +23,8 @@ class App extends Component {
                   inputText: "", //for sending to back end, pure text, no HTML elementes.
                   responsetext: '',
                   isLoading: false,
-                  firstInput: true};
+                  firstInput: true,
+                  enableAutoSuggest: false};
   }
 
   componentDidMount() {
@@ -34,7 +35,7 @@ class App extends Component {
   handleInput = evt => {
     //return; //DISABLE SYNTAX HIHLIGHTING
 
-    let knownWords = ["you", "me"];
+    let knownWords = ["you", "i", "alive"];
     let knownWordsRegExpStr = ""
     knownWords.forEach((word, index) => {
       if (index == knownWords.length-1) {
@@ -149,6 +150,8 @@ class App extends Component {
     });
   }
 
+
+
   render() {
     return (
       <div>
@@ -162,23 +165,14 @@ class App extends Component {
         {/*Helping info*/}
         <Grid>
           <Row>
-            <div className="col-sm-6">
-                <PanelBlack />
-            </div>
-            <div className="col-sm-6">
-                <PanelGreen />
-            </div>
-          </Row>
-
-          <Row>
-            <div className="col-sm-6">
-                <PanelBlue />
-            </div>
-            <div className="col-sm-6">
-                <PanelRed />
-            </div>
+            <Col sm={12}>
+              <PanelAutosuggest onClick={() => { this.setState({ enableAutoSuggest: !this.state.enableAutoSuggest })}}
+                                  enableAutoSuggest={this.state.enableAutoSuggest}
+                                  />
+            </Col>
           </Row>
         </Grid>
+        {this.state.enableAutoSuggest ? <AutoSuggestSection /> : null} 
 
         <br/>
 
@@ -206,6 +200,7 @@ class App extends Component {
             <Col sm={3}>
               {/*space*/}
             </Col>
+
             <Col sm={5}>
               <ContentEditable html={this.state.rawInputText} //innerHTML of the editable div
                                   disabled={false} //use true to disable editting
@@ -222,18 +217,20 @@ class App extends Component {
                                   id="userInput"
                                   />
             </Col>
+
             <Col sm={1}>
-            <Button
-                bsStyle="primary"
-                disabled={this.state.isLoading}
-                onClick={!this.state.isLoading ? () => {
-                  scrollToComponent(this.UserContent);
-                  return this.submitUserQuery(this.state.inputText);
-                } : null} //Only allow clicking once done with first request
-              >
-              {this.state.isLoading ? 'Thinking...' : 'Say'}
-            </Button>
+              <Button
+                  bsStyle="primary"
+                  disabled={this.state.isLoading}
+                  onClick={!this.state.isLoading ? () => {
+                    scrollToComponent(this.UserContent);
+                    return this.submitUserQuery(this.state.inputText);
+                  } : null} //Only allow clicking once done with first request
+                >
+                {this.state.isLoading ? 'Thinking...' : 'Say'}
+              </Button>
             </Col>
+
             <Col sm={3}>
               {/*space*/}
             </Col>
