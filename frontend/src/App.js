@@ -24,38 +24,74 @@ class App extends Component {
                   responsetext: '',
                   isLoading: false,
                   firstInput: true,
-                  enableAutoSuggest: false};
+                  enableAutoSuggest: false,
+                  dictionary: {},
+                  knownWordsRegExpFinder: {},
+                  knownWordsRegExpValidator: {},
+                  };
   }
 
   componentDidMount() {
-    //pass
+    //get and store the autosuggest dict from the back end
+
+    fetch(`/query/autocomp?text=${text}`, {
+      method: "GET",
+      dataType: "JSON",
+      mode: 'cors',
+    })
+    .then( response => response.json() )
+    .then((dict) => {
+      console.log(dict); //TESTING...
+      console.log(dict['a']); //TESTING...
+      console.log(dict['a'][0]); //TESTING...
+      console.log(dict['y']); //TESTING...
+      console.log(dict['y'][0]); //TESTING...
+
+      //build the RegExpressions
+      let knownWordsRegExpStr = "";
+      for (let letter in dict) {
+        //let knownWords = ["you", "i", "alive"];
+        let knownWords = dict[letter];
+
+        if (letter === "z") { 
+          //quick hack to make sure the regular expression ends without an extra | at end
+          //put a single word in the "z" array to make sure it's not empty and passes the
+          //test below.
+          knownWords.append("zebra");
+        }
+
+        knownWords.forEach((word, index) => {
+          if ((index === knownWords.length-1) && letter === "z") {
+            knownWordsRegExpStr += `${word}`;
+          } else {
+            knownWordsRegExpStr += `${word}|`;
+          }
+        });
+        //console.log(`words regex: ${knownWordsRegExpStr}`); //DEBUGGING
+      }
+      let knownWordsRegExpFinder = new RegExp(`\\b(${knownWordsRegExpStr})(?=[^\\w])`,"gi");
+      let knownWordsRegExpValidator = new RegExp(`\\b(${knownWordsRegExpStr})`,"gi");
+
+      this.setState({ dictionary: dict, 
+                      knownWordsRegExpFinder: knownWordsRegExpFinder,
+                      knownWordsRegExpValidator: knownWordsRegExpValidator });
+    })
+    .catch((error) => {
+        console.log(error, "THERE WAS AN ERROR GETing autocomp JSON");
+    });
   }
 
 
   handleInput = evt => {
     //return; //DISABLE SYNTAX HIHLIGHTING
 
-    let knownWords = ["you", "i", "alive"];
-    let knownWordsRegExpStr = ""
-    knownWords.forEach((word, index) => {
-      if (index == knownWords.length-1) {
-        knownWordsRegExpStr += `${word}`;
-      } else {
-        knownWordsRegExpStr += `${word}|`;
-      }
-    });
-    //console.log(`words regex: ${knownWordsRegExpStr}`); //DEBUGGING
-    let knownWordsRegExpFinder = new RegExp(`\\b(${knownWordsRegExpStr})(?=[^\\w])`,"gi");
-    let knownWordsRegExpValidator = new RegExp(`\\b(${knownWordsRegExpStr})`,"gi");
-
-
     let offsetCursor = false;
     let finalRawString = ''; //for front end with formating e.g. <span>...
     let finalInputTextString = ''; //for sending to back end, pure text, no HTML elementes.
     //console.log(`handleInput:: incoming string: ${evt.target.value}`); //DEBUGGING
 
-    //console.log(`:___${evt.nativeEvent.data}___:`); //DEBUGGING
-    /*if (evt.nativeEvent.data !== " ") {
+    //console.log(`:___${evt.nativeEvent.dict}___:`); //DEBUGGING
+    /*if (evt.nativeEvent.dict !== " ") {
       return;
     }*/
 
@@ -94,14 +130,14 @@ class App extends Component {
 
     function processText(text) {
       //REGEXP WAY
-      let parsed = text.replace(knownWordsRegExpFinder,'<span style="color: green;"><b>$1</b></span><text></text>');
+      let parsed = text.replace(this.state.knownWordsRegExpFinder,'<span style="color: green;"><b>$1</b></span><text></text>');
       //parsed = parsed.replace(unknownWordsRegExp,'<span style="color: red;"><b>$1</b></span><text></text>');
       //parsed = parsed.replace(learnWordsRegExp,'<span style="color: blue;"><b>$1</b></span><text></text>');
       return parsed;
     }
 
     function validateSPAN(text) {
-      let parsed = text.replace(knownWordsRegExpValidator,'<span style="color: green;"><b>$1</b></span><text></text>');
+      let parsed = text.replace(this.state.knownWordsRegExpValidator,'<span style="color: green;"><b>$1</b></span><text></text>');
       //parsed = parsed.replace(unknownWordsRegExp,'<span style="color: red;"><b>$1</b></span><text></text>');
       //parsed = parsed.replace(learnWordsRegExp,'<span style="color: blue;"><b>$1</b></span><text></text>');
       return parsed;
@@ -113,6 +149,7 @@ class App extends Component {
       let sel = window.getSelection();
       let lastNode = userInput.childNodes.length-1;
 
+      //TESTING, trying to find how to get the last caret position to offset after
       let caretLastPos = sel.getRangeAt(0).endOffset;
   
       // TESTING
@@ -134,19 +171,20 @@ class App extends Component {
   submitUserQuery(text = "") {
     this.setState({ isLoading: true });
 
+    //get the oracle response
     fetch(`/query/response?text=${text}`, {
         method: "GET",
         dataType: "JSON",
         mode: 'cors',
     })
     .then( response => response.json() )
-    .then((data) => {
-      console.log(data); //TESTING...
-      console.log(data.text); //TESTING...
-      this.setState({ isLoading: false, gotResult: true, responsetext: data.text });
+    .then((dict) => {
+      console.log(dict); //TESTING...
+      console.log(dict.text); //TESTING...
+      this.setState({ isLoading: false, gotResult: true, responsetext: dict.text });
     })
     .catch((error) => {
-        console.log(error, "THERE WAS AN ERROR");
+        console.log(error, "THERE WAS AN ERROR GETing response JSON");
     });
   }
 
@@ -172,7 +210,6 @@ class App extends Component {
             </Col>
           </Row>
         </Grid>
-        {this.state.enableAutoSuggest ? <AutoSuggestSection /> : null} 
 
         <br/>
 
@@ -206,7 +243,8 @@ class App extends Component {
                                   disabled={false} //use true to disable editting
                                   //onChange={this.handleInput} //handle innerHTML change
 
-                                  onChange={() => {setTimeout(this.handleInput, 3000)}} //delay to improve performance
+                                  //onChange={() => {setTimeout(this.handleInput, 3000)}} //delay to improve performance
+                                  onChange={this.state.enableAutoSuggest ? () => {setTimeout(this.handleInput, 3000)} : null}  //delay to improve performance
 
                                   onClick={() => { if (this.state.firstInput === true) {
                                     this.setState({ firstInput: false, rawInputText: '' });

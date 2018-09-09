@@ -153,7 +153,17 @@ class PanelAutosuggest extends Component {
                             </Well>
                         </Tab>
                         <Tab eventKey={5} title="Color Blind?">
-                            Tab 3 content
+                            <br/>Black words Oracle will try to handle: <br/><br/>
+                            <Well bsSize="small">about....does...the...and...or...</Well>
+
+                            <b>Bold</b> words Oracle knows: <br/><br/>
+                            <Well bsSize="small">Hey <b>Oracle</b> how are <b>you</b>?</Well>
+
+                            <i>Italicized</i> words Oracle might learn: <br/><br/>
+                            <Well bsSize="small">Do you know anything about <i>elephants</i>?</Well>
+
+                            <u>Underlined</u> words Oracle doesn't recognise (yet): <br/><br/>
+                            <Well bsSize="small"><u>sooooo</u> cool! I'm just talking nonsense <u>yuewrnruhui43jsk</u> :)</Well>
                         </Tab>
                     </Tabs>
 
