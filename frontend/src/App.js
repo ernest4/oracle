@@ -17,6 +17,7 @@ class App extends Component {
     super(props);
 
     this.handleClick = this.submitUserQuery.bind(this);
+    this.handleInput = this.handleInput.bind(this);
 
     this.state = {gotResult: false,
                   rawInputText: "Let's chat!", //for front end with formating e.g. <span>...
@@ -93,6 +94,9 @@ class App extends Component {
     let finalInputTextString = ''; //for sending to back end, pure text, no HTML elementes.
     //console.log(`handleInput:: incoming string: ${evt.target.value}`); //DEBUGGING
 
+    let knownWordsRegExpFinder = this.state.knownWordsRegExpFinder;
+    let knownWordsRegExpValidator = this.state.knownWordsRegExpValidator;
+
     //console.log(`:___${evt.nativeEvent.dict}___:`); //DEBUGGING
     /*if (evt.nativeEvent.dict !== " ") {
       return;
@@ -133,14 +137,14 @@ class App extends Component {
 
     function processText(text) {
       //REGEXP WAY
-      let parsed = text.replace(this.state.knownWordsRegExpFinder,'<span style="color: green;"><b>$1</b></span><text></text>');
+      let parsed = text.replace(knownWordsRegExpFinder,'<span style="color: green;"><b>$1</b></span><text></text>');
       //parsed = parsed.replace(unknownWordsRegExp,'<span style="color: red;"><b>$1</b></span><text></text>');
       //parsed = parsed.replace(learnWordsRegExp,'<span style="color: blue;"><b>$1</b></span><text></text>');
       return parsed;
     }
 
     function validateSPAN(text) {
-      let parsed = text.replace(this.state.knownWordsRegExpValidator,'<span style="color: green;"><b>$1</b></span><text></text>');
+      let parsed = text.replace(knownWordsRegExpValidator,'<span style="color: green;"><b>$1</b></span><text></text>');
       //parsed = parsed.replace(unknownWordsRegExp,'<span style="color: red;"><b>$1</b></span><text></text>');
       //parsed = parsed.replace(learnWordsRegExp,'<span style="color: blue;"><b>$1</b></span><text></text>');
       return parsed;
