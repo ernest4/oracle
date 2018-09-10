@@ -137,7 +137,8 @@ class PanelAutosuggest extends Component {
                             </Well>
                         </Tab>
                         <Tab eventKey={3} title="Blue">
-                            <br/><b><span style={{ color: "blue"}}>Blue</span></b> words Oracle might learn: <br/><br/>
+                            <p style={{color: "red"}}>*COMMING SOON*</p>
+                            <b><span style={{ color: "blue"}}>Blue</span></b> words Oracle might learn: <br/><br/>
                             <Well bsSize="large">
                                 Tell me about <b><span style={{ color: "blue"}}>planes</span></b>. Do you
                                 know anything about <b><span style={{ color: "blue"}}>elephants</span></b>?
@@ -145,7 +146,8 @@ class PanelAutosuggest extends Component {
                             </Well>
                         </Tab>
                         <Tab eventKey={4} title="Red">
-                            <br/><b><span style={{ color: "red"}}>Red</span></b> words Oracle doesn't recognise (yet): <br/><br/>
+                            <p style={{color: "red"}}>*COMMING SOON*</p>
+                            <b><span style={{ color: "red"}}>Red</span></b> words Oracle doesn't recognise (yet): <br/><br/>
                             <Well bsSize="large">
                                 <b><span style={{ color: "red"}}>wooooooah</span></b> this 
                                 is <b><span style={{ color: "red"}}>sooooo</span></b> cool!
@@ -158,10 +160,12 @@ class PanelAutosuggest extends Component {
 
                             <b>Bold</b> words Oracle knows: <br/><br/>
                             <Well bsSize="small">Hey <b>Oracle</b> how are <b>you</b>?</Well>
-
+                            
+                            <p style={{color: "red"}}>*COMMING SOON*</p>
                             <i>Italicized</i> words Oracle might learn: <br/><br/>
                             <Well bsSize="small">Do you know anything about <i>elephants</i>?</Well>
 
+                            <p style={{color: "red"}}>*COMMING SOON*</p>
                             <u>Underlined</u> words Oracle doesn't recognise (yet): <br/><br/>
                             <Well bsSize="small"><u>sooooo</u> cool! I'm just talking nonsense <u>yuewrnruhui43jsk</u> :)</Well>
                         </Tab>

@@ -34,7 +34,7 @@ class App extends Component {
   componentDidMount() {
     //get and store the autosuggest dict from the back end
 
-    fetch(`/query/autocomp?text=${text}`, {
+    fetch(`/query/autocomp`, {
       method: "GET",
       dataType: "JSON",
       mode: 'cors',
@@ -57,7 +57,7 @@ class App extends Component {
           //quick hack to make sure the regular expression ends without an extra | at end
           //put a single word in the "z" array to make sure it's not empty and passes the
           //test below.
-          knownWords.append("zebra");
+          knownWords.push("zebra");
         }
 
         knownWords.forEach((word, index) => {
@@ -71,6 +71,9 @@ class App extends Component {
       }
       let knownWordsRegExpFinder = new RegExp(`\\b(${knownWordsRegExpStr})(?=[^\\w])`,"gi");
       let knownWordsRegExpValidator = new RegExp(`\\b(${knownWordsRegExpStr})`,"gi");
+
+      console.log(`knownWordsRegExpFinder source: ${knownWordsRegExpFinder.source}`); //DEBUGGING
+      console.log(`knownWordsRegExpValidator source: ${knownWordsRegExpValidator.source}`); //DEBUGGING
 
       this.setState({ dictionary: dict, 
                       knownWordsRegExpFinder: knownWordsRegExpFinder,
@@ -171,6 +174,8 @@ class App extends Component {
   submitUserQuery(text = "") {
     this.setState({ isLoading: true });
 
+    console.log("SUBMITTING:",text);
+
     //get the oracle response
     fetch(`/query/response?text=${text}`, {
         method: "GET",
@@ -240,20 +245,21 @@ class App extends Component {
 
             <Col sm={5}>
               <ContentEditable html={this.state.rawInputText} //innerHTML of the editable div
-                                  disabled={false} //use true to disable editting
-                                  //onChange={this.handleInput} //handle innerHTML change
+                                disabled={false} //use true to disable editting
+                                //onChange={this.handleInput} //handle innerHTML change
 
-                                  //onChange={() => {setTimeout(this.handleInput, 3000)}} //delay to improve performance
-                                  onChange={this.state.enableAutoSuggest ? () => {setTimeout(this.handleInput, 3000)} : null}  //delay to improve performance
+                                //onChange={() => {setTimeout(this.handleInput, 3000)}} //delay to improve performance
+                                onChange={this.state.enableAutoSuggest ? () => {setTimeout(this.handleInput, 3000)} : //delay to improve performance
+                                                                         (evt) => {this.setState({ inputText:  evt.target.value})}} //or use raw text if highlighting disabled
 
-                                  onClick={() => { if (this.state.firstInput === true) {
-                                    this.setState({ firstInput: false, rawInputText: '' });
-                                  }}}
-                                  className="UserContent"
-                                  ref={(ContentEditable) => {this.UserContent = ContentEditable;}}
+                                onClick={() => { if (this.state.firstInput === true) {
+                                  this.setState({ firstInput: false, rawInputText: '' });
+                                }}}
+                                className="UserContent"
+                                ref={(ContentEditable) => {this.UserContent = ContentEditable;}}
 
-                                  id="userInput"
-                                  />
+                                id="userInput"
+                                />
             </Col>
 
             <Col sm={1}>
