@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Grid, Row, Col, Image, Button, Panel} from 'react-bootstrap';
+import {Grid, Row, Col, Image, Button, Panel, OverlayTrigger, Popover, Label} from 'react-bootstrap';
 import logo from './images/logo.svg';
 import myoracle from './images/myoracle.png'
 import './App.css';
@@ -10,7 +10,27 @@ import ContentEditable from 'react-contenteditable';
 import scrollToComponent from 'react-scroll-to-component';
 import {Green} from './texthighlights.js';
 
+const popoverClickRootClose = (
+  <Popover id="popover-trigger-click-root-close" title="Known Bugs / Issues">
+      <p><Label bsStyle="danger">Major</Label> Oracle's current comprehension and vocabulary
+      is limited and under development.</p>
 
+      <p><Label bsStyle="danger">Major</Label> Cat recognition feature is under development.</p>
+
+      <p><Label bsStyle="danger">Major</Label> Oracle is not yet animated.</p>
+
+      <p><Label bsStyle="danger">Major</Label> Yes/No feedback of Oracle response is not (yet)
+      functioning.</p>
+
+      <p><Label bsStyle="default">Medium</Label> Presentation of the app is not finalised and
+      may change drastically.</p>
+
+      <p><Label bsStyle="default">Medium</Label> Not much error handling present.</p>
+
+      <p><Label bsStyle="info">Minor</Label> Syntax highlighting is incomplete feature.</p>
+      
+  </Popover>
+);
 
 class App extends Component {
   constructor(props){
@@ -25,7 +45,7 @@ class App extends Component {
                   responsetext: '',
                   isLoading: false,
                   firstInput: true,
-                  enableAutoSuggest: false,
+                  isAutoSuggestEnabled: false,
                   dictionary: {},
                   knownWordsRegExpFinder: {},
                   knownWordsRegExpValidator: {},
@@ -204,7 +224,18 @@ class App extends Component {
       <div>
         <header className="App-header">
           <img src={myoracle} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to My Oracle!</h1>
+          <h1 className="App-title">
+          Welcome to My Oracle! <span></span>
+
+          <OverlayTrigger
+              trigger="click"
+              rootClose
+              placement="bottom"
+              overlay={popoverClickRootClose}
+              >
+          <Button bsStyle="danger">*BETA*</Button>
+          </OverlayTrigger>
+          </h1>
         </header>
 
         <br />
@@ -213,8 +244,8 @@ class App extends Component {
         <Grid>
           <Row>
             <Col sm={12}>
-              <PanelAutosuggest onClick={() => { this.setState({ enableAutoSuggest: !this.state.enableAutoSuggest })}}
-                                  enableAutoSuggest={this.state.enableAutoSuggest}
+              <PanelAutosuggest onClick={() => { this.setState({ isAutoSuggestEnabled: !this.state.isAutoSuggestEnabled })}}
+                                  isAutoSuggestEnabled={this.state.isAutoSuggestEnabled}
                                   />
             </Col>
           </Row>
@@ -253,7 +284,7 @@ class App extends Component {
                                 //onChange={this.handleInput} //handle innerHTML change
 
                                 //onChange={() => {setTimeout(this.handleInput, 3000)}} //delay to improve performance
-                                onChange={this.state.enableAutoSuggest ? () => {setTimeout(this.handleInput, 3000)} : //delay to improve performance
+                                onChange={this.state.isAutoSuggestEnabled ? () => {setTimeout(this.handleInput, 3000)} : //delay to improve performance
                                                                          (evt) => {this.setState({ inputText:  evt.target.value})}} //or use raw text if highlighting disabled
 
                                 onClick={() => { if (this.state.firstInput === true) {

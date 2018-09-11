@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import {Panel, Button, Grid, Row, Tabs, Tab, Carousel, Well} from 'react-bootstrap';
+import {Panel, Button, Grid, Row, Tabs, Tab, Carousel, Well, OverlayTrigger, Popover,
+         Label, ListGroup, ListGroupItem} from 'react-bootstrap';
 
 class PanelBlack extends Component {
     render() {
@@ -108,6 +109,32 @@ class PanelCat extends Component {
     }
 }
 
+
+const popoverClickRootClose = (
+    <Popover id="popover-trigger-click-root-close" title="Known Bugs / Issues">
+        <p><Label bsStyle="danger">Major</Label> Deleting all the input from the input field
+        will crash the app.</p>
+
+        <p><Label bsStyle="default">Medium</Label> Performance degrades as more and more words
+         are typed.</p>
+
+        <p><Label bsStyle="default">Medium</Label> The caret (cursor) jumps back to end of the
+        input text when editing the middle of text.</p>
+
+        <p><Label bsStyle="info">Minor</Label> Syntax highlighting is delayed for 3 seconds to
+        help with performance.</p>
+
+        <p><Label bsStyle="info">Minor</Label> Due to highlighting delay, some words are wrongly
+         briefly highlighting before returning to black.</p>
+
+        <p><Label bsStyle="info">Minor</Label> Blue and Red highlighting are not (yet) available.</p>
+
+        <p><Label bsStyle="info">Minor</Label> Color Blind mode does not have a separate button (yet).
+        Shares functionality with regular syntax highlighting (green words are also bold).</p>
+        
+    </Popover>
+  );
+
 class PanelAutosuggest extends Component {
     render() {
         return(
@@ -121,7 +148,16 @@ class PanelAutosuggest extends Component {
                 </Panel.Heading>
                 <Panel.Collapse>
                 <Panel.Body>
-                    <p style={{color: "red"}}>*BETA*</p>
+                    <OverlayTrigger
+                        trigger="click"
+                        rootClose
+                        placement="right"
+                        overlay={popoverClickRootClose}
+                        >
+                    <Button bsStyle="danger">*BETA*</Button>
+                    </OverlayTrigger>
+
+                    <br/><br/>
 
                     <Tabs defaultActiveKey={1} id="uncontrolled-tab">
                         <Tab eventKey={1} title="Black">
@@ -174,10 +210,10 @@ class PanelAutosuggest extends Component {
                     <br/>
 
                     <Button
-                    bsStyle="warning"
+                    bsStyle={this.props.isAutoSuggestEnabled ? "danger" : "primary"}
                     disabled={false}
                     onClick={this.props.onClick}
-                    >{this.props.enableAutoSuggest ? "Disable" : "Enable"}</Button>
+                    >{this.props.isAutoSuggestEnabled ? "Disable" : "Enable"}</Button>
                 </Panel.Body>
                 </Panel.Collapse>
             </Panel>
